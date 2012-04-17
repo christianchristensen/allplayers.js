@@ -3,38 +3,88 @@
   <head>
     <title>AllPlayers.com Javascript OAuth</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <link rel='stylesheet' type='text/css' href='../treeselect/css/chosen.css' />
     <script type='text/javascript' src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.js"></script>
     <script type='text/javascript' src='../../drupal.api.js/bin/drupal.api.js'></script>
     <script type='text/javascript' src='../../bin/allplayers.js'></script>
+    <script type='text/javascript' src='js/sha1.js'></script>
+    <script type='text/javascript' src='js/oauth.js'></script>
     <script type='text/javascript' src='../../src/allplayers.oauth.js'></script>
     <script type='text/javascript'>
       jQuery(function() {
+        // OAuth App "dance"
+        var site_url = $("input[name=site_url]").val();
         drupal.endpoint = '/api/v1/rest';
-        /*$(".group_navigator").group_navigator({
-          deepLoad: true,
-          uuid: "24722bb4-a8c2-11e0-899f-12313d18191a"
-          });*/
+        // 2
         $("#request_token").click(function() {
-          var data = {};
-          var url = allplayers.consumer.request_token(data);
-
+          var consumerKey = $("input[name=consumerKey]").val();
+          var consumerSecret = $("input[name=consumerSecret]").val();
+          var query = allplayers.consumer.request_token(site_url, consumerKey, consumerSecret);
+          var href = query.url + "?" + $.param(query.data);
+          $("#request_token").replaceWith($("<a>", {
+            text: href,
+            title: href,
+            href: href,
+            target: "_blank"
+          }));
+        });
+        // 3
+        $("#authorize").click(function() {
+          var oauth_token = $("input[name=oauth_token]").val();
+          var href = site_url + allplayers.consumer.credentials.serviceProvider.userAuthorizationURL;
+          href = href + "?" + $.param({"oauth_token": oauth_token});
+          $("#authorize").replaceWith($("<a>", {
+            text: href,
+            title: href,
+            href: href,
+            target: "_blank"
+          }));
+        });
+        // 4
+        $("#access_token").click(function() {
+          var oauth_token = $("input[name=oauth_token]").val();
+          var oauth_token_secret = $("input[name=oauth_token_secret]").val();
+          var query = allplayers.consumer.access_token(site_url, oauth_token, oauth_token_secret);
+          var href = query.url + "?" + $.param(query.data);
+          $("#access_token").replaceWith($("<a>", {
+            text: href,
+            title: href,
+            href: href,
+            target: "_blank"
+          }));
+        });
+        // 5
+        $("#current_user").click(function() {
+          var access_token = $("input[name=access_token]").val();
+          var access_token_secret = $("input[name=access_token_secret]").val();
+          var user_url = site_url + "/api/v1/rest/groups.json";
+          var query = allplayers.consumer.authorized_call(user_url, access_token, access_token_secret);
+          var href = query.url + "?" + $.param(query.data);
+          $("#current_user").replaceWith($("<a>", {
+            text: href,
+            title: href,
+            href: href,
+            target: "_blank"
+          }));
         });
       });
     </script>
   </head>
   <body>
-    <a id="request_token">Request Token</a>
-    <a id="authorize">Authorize</a>
-    <a id="access_token">Access Token</a>
-
-    <form name="oauth" method="POST" onSubmit="consumer.signForm(this, document.etc)">
-      <input type="submit" value="Get Request Token"/><br/>
-      <input name="oauth_consumer_key"     type="hidden"/>
-      <input name="oauth_signature_method" type="hidden"/>
-      <input name="oauth_timestamp"        type="hidden"/>
-      <input name="oauth_nonce"            type="hidden"/>
-      <input name="oauth_signature"        type="hidden"/>
-    </form>
+    <input name="site_url" value="https://www.pdup.allplayers.com" type="text"/>
+    <!-- 1 -->
+    <input name="consumerKey" value="AWeKC3PVG7DmP8JcgFgACqAL4tz3HkGD" type="text"/>
+    <input name="consumerSecret" value="XCGYQS9noNt3wJxDKJ3CTmSa8mA8v3gs" type="text"/> <br />
+    <!-- 2 -->
+    <a href="#" id="request_token">Request Token</a><br/>
+    <!-- 3 -->
+    <input name="oauth_token" type="text"/>
+    <input name="oauth_token_secret" type="text"/> <br />
+    <a href="#" id="authorize">Authorize</a><br/>
+    <!-- 4 -->
+    <a href="#" id="access_token">Access Token</a><br/>
+    <!-- 5 -->
+    <input name="access_token" type="text"/>
+    <input name="access_token_secret" type="text"/> <br />
+    <a href="#" id="current_user">Current User</a> <br/>
   </body>
 </html>

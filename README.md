@@ -1,1 +1,3 @@
 TO-DO: Add documentation...
+
+Useful docs: http://dochub.io/#jquery/post

@@ -90,3 +90,5 @@ lib:
 	unzip lib/fullcalendar-1.5.2.zip -d lib
 	sudo mv lib/fullcalendar-1.5.2 lib/fullcalendar
 	sudo rm lib/fullcalendar-1.5.2.zip
+
+# TODO: Update OAuth directory http://oauth.googlecode.com/svn/code/javascript/
